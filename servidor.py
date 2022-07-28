@@ -1,3 +1,4 @@
+import queue
 import threading
 import time
 
@@ -11,10 +12,13 @@ app.config["SECRET_KEY"] = "justasecretkeythatishouldputhere"
 socketio = SocketIO(app)
 CORS(app)
 
+q = queue.LifoQueue()
+
 
 def background():
     rept = 0
     while rept <= 1000:
+        q.put({"repeticao": rept})
         socketio.emit("back", dict(data=f"teste{rept}"), broadcast=True)
         rept += 1
         time.sleep(5)
@@ -26,6 +30,7 @@ thread.start()
 
 @app.route("/")
 def index():
+    print(q.get())
     return render_template("index.html")
 
 
